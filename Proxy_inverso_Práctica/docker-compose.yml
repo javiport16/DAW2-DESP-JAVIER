@@ -1,0 +1,27 @@
+
+services:
+  flask:
+    build: ./app
+    restart: unless-stopped
+    expose:
+      - "5000"
+    networks:
+      - red_privada
+
+  nginx:
+    image: nginx:stable
+    restart: unless-stopped
+    depends_on:
+      - flask
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    networks:
+      - red_privada
+
+networks:
+  red_privada:
+    driver: bridge
