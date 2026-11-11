@@ -1,0 +1,26 @@
+INSTRUCCIONES DEL SCRIPT USER DATA
+
+Archivo: configuracion/user-data.sh
+
+1.  apt update -y Actualiza el índice de paquetes de Ubuntu para que el
+    sistema conozca las versiones disponibles.
+
+2.  apt install -y docker.io git curl Instala Docker, Git y curl. La
+    opción -y confirma automáticamente la instalación.
+
+3.  systemctl enable docker Configura Docker para que se inicie
+    automáticamente al arrancar Ubuntu.
+
+4.  systemctl start docker Inicia el servicio Docker en ese momento.
+
+5.  mkdir -p /opt/practica04 Crea la carpeta de trabajo /opt/practica04.
+    La opción -p evita errores si la carpeta ya existe.
+
+INCIDENCIA OBSERVADA EN ESTA EJECUCIÓN Cloud-init informó de un fallo en
+el módulo scripts_user. Por ello, Docker, Git y curl se instalaron
+manualmente por SSH y se verificó Docker con docker –version y systemctl
+status docker. En la memoria se debe describir esta incidencia con
+transparencia.
+
+Para revisar el resultado de User Data: sudo cat
+/var/log/cloud-init-output.log sudo cloud-init status –long
