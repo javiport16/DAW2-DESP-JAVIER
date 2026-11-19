@@ -1,0 +1,12 @@
+# Estado de Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Proveedores descargados
+**/.terraform/
+
+# Claves y credenciales
+*.pem
+*.key
+*.tfvars.json
