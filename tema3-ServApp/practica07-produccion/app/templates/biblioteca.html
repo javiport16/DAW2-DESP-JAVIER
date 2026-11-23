@@ -1,0 +1,104 @@
+{% from "_portada_catalogo.html" import mostrar_portada %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101018">
+    <title>Mi biblioteca | SoundWave AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('inicio') }}" class="logo">
+            <span class="logo-icon">◉</span>
+            SoundWave<span class="logo-ai">AI</span>
+        </a>
+        <p class="menu-label">DESCUBRIR</p>
+        <nav class="nav-menu">
+            <a href="{{ url_for('inicio') }}" class="nav-link">⌂ &nbsp; Inicio</a>
+            <a href="{{ url_for('explorar') }}" class="nav-link">♫ &nbsp; Explorar música</a>
+        </nav>
+        <p class="menu-label">TU ESPACIO</p>
+        <nav class="nav-menu">
+            <a href="{{ url_for('biblioteca') }}" class="nav-link active">♡ &nbsp; Mi biblioteca</a>
+            <a href="/playlists" class="nav-link">▤ &nbsp; Mis playlists</a>
+            <a href="/dj" class="nav-link">✦ &nbsp; SoundWave DJ</a>
+        </nav>
+        <div class="sidebar-bottom">
+            <p>Tu música. Tu universo.</p>
+            <span>SoundWave AI © 2026</span>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-message">
+                <span class="online-dot"></span>
+                TU COLECCIÓN PERSONAL
+            </div>
+            <div class="user-profile">
+                {% if session.get('avatar_url') %}
+                <img src="{{ session.get('avatar_url') }}" alt="Tu foto de perfil" class="user-avatar" referrerpolicy="no-referrer">
+                {% endif %}
+                <span class="user-name">{{ session.get('nombre', 'Usuario') }}</span>
+                <form action="{{ url_for('logout') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="logout-button">Salir</button>
+                </form>
+            </div>
+        </header>
+
+        <section class="catalog-header">
+            <span class="eyebrow">YOUR PERSONAL SOUNDTRACK</span>
+            <h1>Mi biblioteca<span>.</span></h1>
+            <p>Las canciones que te gustan, guardadas en un solo lugar.</p>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">HECHO PARA TI</span>
+                    <h2>Tus canciones favoritas</h2>
+                </div>
+                <span class="results-count">{{ canciones|length }} canciones</span>
+            </div>
+            <div class="songs-grid">
+                {% for cancion in canciones %}
+                <article class="song-card">
+                    {{ mostrar_portada(cancion) }}
+                    <div class="song-details">
+                        <span class="song-genre">{{ cancion.genero }}</span>
+                        <h3>{{ cancion.titulo }}</h3>
+                        <p>{{ cancion.artista }}</p>
+                        <small>{{ cancion.album or 'Single' }}</small>
+                    </div>
+                    <div class="song-actions">
+                        {% if cancion.spotify_url %}
+                        <a href="{{ cancion.spotify_url }}" target="_blank" rel="noopener noreferrer" class="spotify-link">Escuchar en Spotify ↗</a>
+                        {% endif %}
+                        <form action="{{ url_for('borrar_favorito', cancion_id=cancion.id) }}" method="POST" class="favorite-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="remove-favorite">♡ Quitar de favoritos</button>
+                        </form>
+                    </div>
+                </article>
+                {% else %}
+                <div class="empty-state">
+                    <span>♡</span>
+                    <h3>Tu biblioteca está esperando música</h3>
+                    <p>Explora el catálogo y guarda las canciones que más te gusten.</p>
+                    <a href="{{ url_for('explorar') }}" class="button-primary">Descubrir canciones →</a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        <footer class="footer">
+            <span>© 2026 SoundWave AI</span>
+            <span>Tu colección, a tu manera ♡</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

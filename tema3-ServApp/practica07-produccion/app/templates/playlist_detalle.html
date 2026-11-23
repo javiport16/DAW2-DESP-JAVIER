@@ -1,0 +1,80 @@
+{% extends "_playlists_base.html" %}
+{% from "_portada_catalogo.html" import mostrar_portada %}
+{% from "_playlist_campos.html" import campos_playlist with context %}
+{% block titulo %}{{ playlist.nombre }}{% endblock %}
+{% block contenido %}
+        <section class="catalog-header">
+            <a class="section-link" href="{{ url_for('playlists') }}">← Mis playlists</a>
+            <h1>{{ playlist.nombre }}</h1>
+            {% if playlist.descripcion %}
+            <p>{{ playlist.descripcion }}</p>
+            {% endif %}
+        </section>
+
+        <section class="content-section">
+            <h2>Añadir una canción</h2>
+            <form class="search-panel" method="get" action="{{ url_for('detalle_playlist', playlist_id=playlist.id) }}">
+                <input type="search" name="q" value="{{ busqueda }}" placeholder="Buscar canciones o artistas" aria-label="Buscar canciones o artistas">
+                <button type="submit" class="button-secondary">Buscar</button>
+            </form>
+            {% if disponibles %}
+            <form class="search-panel" method="post" action="{{ url_for('guardar_cancion_playlist', playlist_id=playlist.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="cancion_id" aria-label="Canción del catálogo" required>
+                    <option value="">Selecciona una canción</option>
+                    {% for cancion in disponibles %}
+                    <option value="{{ cancion.id }}">{{ cancion.titulo }} — {{ cancion.artista }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="button-primary">Añadir a la playlist</button>
+            </form>
+            {% elif busqueda %}
+            <p>No hay canciones disponibles para esta búsqueda.</p>
+            {% else %}
+            <p>No hay canciones disponibles para añadir.</p>
+            {% endif %}
+        </section>
+
+        <section class="content-section">
+            <h2>Canciones de la playlist</h2>
+            <div class="songs-grid">
+                {% for cancion in canciones %}
+                <article class="song-card">
+                    {{ mostrar_portada(cancion) }}
+                    <div class="song-details">
+                        <span class="song-genre">{{ cancion.genero or '' }}</span>
+                        <h3>{{ cancion.titulo }}</h3>
+                        <p>{{ cancion.artista }}</p>
+                        <small>{{ cancion.album or 'Single' }}</small>
+                    </div>
+                    <div class="song-actions">
+                        {% if cancion.spotify_url %}
+                        <a href="{{ cancion.spotify_url }}" target="_blank" rel="noopener noreferrer" class="spotify-link">Escuchar en Spotify ↗</a>
+                        {% endif %}
+                        <form method="post" class="favorite-form" action="{{ url_for('borrar_cancion_playlist', playlist_id=playlist.id, cancion_id=cancion.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="add-favorite" aria-label="Quitar {{ cancion.titulo }} de la playlist">Quitar de la playlist</button>
+                        </form>
+                    </div>
+                </article>
+                {% else %}
+                <p class="empty-state">Esta playlist todavía está vacía.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Editar playlist</h2>
+            <form class="search-panel" method="post" action="{{ url_for('actualizar_playlist', playlist_id=playlist.id) }}">
+                {{ campos_playlist('Guardar cambios', playlist.nombre, playlist.descripcion or '') }}
+            </form>
+            <details>
+                <summary>Eliminar playlist</summary>
+                <p>Se eliminará la playlist y su selección de canciones. Las canciones seguirán en el catálogo.</p>
+                <form method="post" action="{{ url_for('borrar_playlist', playlist_id=playlist.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="logout-button">Eliminar playlist definitivamente</button>
+                </form>
+            </details>
+        </section>
+{% endblock %}

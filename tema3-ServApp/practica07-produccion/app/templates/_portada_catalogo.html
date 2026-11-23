@@ -1,0 +1,19 @@
+{% macro mostrar_portada(cancion) %}
+    {% set portada, alternativa = portada_catalogo(cancion) %}
+    {% set fondo = url_for('static', filename='img/generos/' ~ alternativa ~ '.png') %}
+    {% if portada %}
+        <a class="song-cover album-cover" data-portada-catalogo="spotify"
+           href="{{ portada[0] }}" target="_blank" rel="noopener noreferrer"
+           aria-label="Ver {{ cancion.album }} en Spotify"
+           style="background-image: url('{{ portada[1] }}'), url('{{ fondo }}');"></a>
+        <a class="album-cover__source" href="{{ portada[0] }}" target="_blank" rel="noopener noreferrer"
+           aria-label="Portada facilitada por Spotify. Ver {{ cancion.album }}">
+            <img src="https://developer-assets.spotifycdn.com/images/guidelines/design/icon3.svg"
+                 width="22" height="22" alt="" loading="lazy">&nbsp; Spotify
+        </a>
+    {% else %}
+        <div class="song-cover album-cover" data-portada-catalogo="alternativa"
+             role="img" aria-label="Ilustración musical alternativa"
+             style="background-image: url('{{ fondo }}');"></div>
+    {% endif %}
+{% endmacro %}

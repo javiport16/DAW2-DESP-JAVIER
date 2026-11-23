@@ -1,0 +1,59 @@
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: soundwave_db
+      MARIADB_USER: soundwave
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - soundwave_datos:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/datos.sql:/docker-entrypoint-initdb.d/02-datos.sql:ro
+    networks:
+      - soundwave_net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  flask:
+    build: ./app
+    restart: unless-stopped
+    environment:
+      DB_HOST: mariadb
+      DB_USER: soundwave
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: soundwave_db
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - soundwave_net
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8005:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - flask
+    networks:
+      - soundwave_net
+
+volumes:
+  soundwave_datos:
+
+networks:
+  soundwave_net:
+    driver: bridge

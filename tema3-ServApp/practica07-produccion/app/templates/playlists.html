@@ -1,0 +1,36 @@
+{% extends "_playlists_base.html" %}
+{% from "_playlist_campos.html" import campos_playlist with context %}
+{% block contenido %}
+        <section class="catalog-header">
+            <h1>Mis playlists<span>.</span></h1>
+        </section>
+
+        <section class="content-section">
+            <h2>Crear playlist</h2>
+            <form class="search-panel" method="post" action="{{ url_for('playlists') }}">
+                {{ campos_playlist('Crear playlist') }}
+            </form>
+        </section>
+
+        <section class="content-section" aria-labelledby="tus-playlists">
+            <h2 id="tus-playlists">Tus playlists</h2>
+            <div class="songs-grid">
+                {% for playlist in playlists %}
+                <article class="song-card">
+                    <div class="song-details">
+                        <h3>{{ playlist.nombre }}</h3>
+                        {% if playlist.descripcion %}
+                        <p>{{ playlist.descripcion }}</p>
+                        {% endif %}
+                        <small>{{ playlist.total }} {{ 'canción' if playlist.total == 1 else 'canciones' }}</small>
+                    </div>
+                    <div class="song-actions">
+                        <a class="button-secondary" href="{{ url_for('detalle_playlist', playlist_id=playlist.id) }}">Abrir playlist</a>
+                    </div>
+                </article>
+                {% else %}
+                <p class="empty-state">Todavía no tienes playlists.</p>
+                {% endfor %}
+            </div>
+        </section>
+{% endblock %}

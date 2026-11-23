@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101018">
+    <title>SoundWave AI | Descubre tu sonido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="app-layout">
+        <aside class="sidebar">
+            <a href="{{ url_for('inicio') }}" class="logo">
+                <span class="logo-icon">◉</span>
+                SoundWave<span class="logo-ai">AI</span>
+            </a>
+
+            <p class="menu-label">DESCUBRIR</p>
+
+            <nav class="nav-menu">
+                <a href="{{ url_for('inicio') }}" class="nav-link active">⌂ &nbsp; Inicio</a>
+                <a href="{{ url_for('explorar') }}" class="nav-link">♫ &nbsp; Explorar música</a>
+            </nav>
+
+            <p class="menu-label">TU ESPACIO</p>
+
+            <nav class="nav-menu">
+                <a href="{{ url_for('biblioteca') }}" class="nav-link">♡ &nbsp; Mi biblioteca</a>
+                <a href="/playlists" class="nav-link">▤ &nbsp; Mis playlists</a>
+                <a href="/dj" class="nav-link">✦ &nbsp; SoundWave DJ</a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <p>Tu música. Tus reglas.</p>
+                <span>SoundWave AI © 2026</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-message">
+                    <span class="online-dot"></span>
+                    TU NUEVA FORMA DE DESCUBRIR MÚSICA
+                </div>
+                                {% if session.get('usuario_id') %}
+                <div class="user-profile">
+                    {% if session.get('avatar_url') %}
+                    <img
+                        src="{{ session.get('avatar_url') }}"
+                        alt="Foto de perfil"
+                        class="user-avatar"
+                        referrerpolicy="no-referrer"
+                    >
+                    {% endif %}
+                    <span class="user-name">Hola, {{ session.get('nombre') }}</span>
+                    <form action="{{ url_for('logout') }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="logout-button">Salir</button>
+                    </form>
+                </div>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="login-button">Iniciar sesión con Google</a>
+                {% endif %}
+            </header>
+
+            <section class="hero">
+                <div class="hero-content">
+                    <span class="hero-tag">✦ MUSIC DISCOVERY, REIMAGINED</span>
+                    <h1>La música que buscas.<br><span>La que aún no conoces.</span></h1>
+                    <p>Explora nuevos sonidos, crea tu universo musical y descubre recomendaciones con inteligencia artificial.</p>
+                    <div class="hero-actions">
+                        <a href="/explorar" class="button-primary">Explorar música →</a>
+                        <a href="/dj" class="button-secondary">✦ Conoce a tu DJ AI</a>
+                    </div>
+                </div>
+                <div class="hero-art">
+                    <div class="vinyl-record">
+                        <div class="vinyl-label">SW<span>AI</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">ENCUENTRA TU VIBE</span>
+                        <h2>¿Qué te apetece escuchar?</h2>
+                    </div>
+                    <a href="/explorar" class="section-link">Ver todo →</a>
+                </div>
+
+                <div class="mood-grid">
+                    <a href="/explorar?genero=Synth-pop" class="mood-card mood-night">
+                        <span class="mood-symbol">☾</span>
+                        <strong>Midnight Drive</strong>
+                        <small>Sonidos para perderte de noche</small>
+                    </a>
+                    <a href="/explorar?genero=Hip-hop" class="mood-card mood-energy">
+                        <span class="mood-symbol">⚡</span>
+                        <strong>Full Energy</strong>
+                        <small>Sube el volumen</small>
+                    </a>
+                    <a href="/explorar?genero=R%26B" class="mood-card mood-chill">
+                        <span class="mood-symbol">◈</span>
+                        <strong>Slow Motion</strong>
+                        <small>Desconecta del mundo</small>
+                    </a>
+                    <a href="/explorar?genero=Indie%20rock" class="mood-card mood-indie">
+                        <span class="mood-symbol">✳</span>
+                        <strong>Indie Universe</strong>
+                        <small>Tu lado alternativo</small>
+                    </a>
+                </div>
+            </section>
+
+            <section class="content-section ai-section">
+                <div class="ai-glow"></div>
+                <div class="ai-section-content">
+                    <span class="eyebrow">TU ASISTENTE MUSICAL</span>
+                    <h2>Tu próximo temazo está a una pregunta.</h2>
+                    <p>Cuéntale a SoundWave DJ cómo te sientes, qué artistas te gustan o qué sonido buscas. Deja que la IA te ayude a descubrir música nueva.</p>
+                    <a href="/dj" class="button-primary">✦ Hablar con SoundWave DJ</a>
+                </div>
+                <div class="ai-visual">✦</div>
+            </section>
+
+            <footer class="footer">
+                <span>© 2026 SoundWave AI</span>
+                <span>Made for music lovers ♡</span>
+            </footer>
+        </main>
+    </div>
+
+</body>
+</html>

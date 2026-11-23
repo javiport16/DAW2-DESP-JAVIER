@@ -1,0 +1,51 @@
+{% extends "_playlists_base.html" %}
+{% block titulo %}SoundWave DJ{% endblock %}
+{% block contenido %}
+<section class="content-section">
+    <div class="catalog-header">
+        <h1>SoundWave DJ</h1>
+    </div>
+    <p>Pide música del catálogo para tu momento. Las consultas se envían a Gemini.</p>
+    {% if session.get('usuario_id') %}
+    <form method="post" class="search-panel dj-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="consulta">¿Qué quieres escuchar?</label>
+        <textarea id="consulta" name="consulta" rows="3" minlength="3" maxlength="400"
+                  required placeholder="Por ejemplo, música para correr">{{ consulta|default('') }}</textarea>
+        <button type="submit" class="button-primary">Recomendar canciones</button>
+    </form>
+    {% else %}
+    <a class="button-primary" href="{{ url_for('login') }}">Entrar con Google</a>
+    {% endif %}
+    {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+    {% if canciones %}
+    <h2>Tu selección</h2>
+    <div class="songs-grid">
+        {% for cancion in canciones %}
+        <article class="song-card">
+            {# Preferimos la portada real de Spotify cuando está catalogada. #}
+            {% set portada, _genero_portada = portada_catalogo(cancion) %}
+            {% set imagen = portada[1] if portada else cancion.imagen_url %}
+            <div class="song-cover">
+                {% if imagen %}
+                <img src="{{ imagen }}"
+                     alt="Portada de {{ cancion.titulo }} de {{ cancion.artista }}"
+                     loading="lazy"
+                     referrerpolicy="no-referrer"
+                     onerror="this.onerror=null;this.style.display='none';this.parentElement.querySelector('.cover-note').style.display='flex';">
+                <span class="cover-note" aria-hidden="true" style="display:none">♫</span>
+                {% else %}
+                <span class="cover-note" aria-hidden="true">♫</span>
+                {% endif %}
+            </div>
+            <div class="song-details"><h3>{{ cancion.titulo }}</h3><p>{{ cancion.artista }} · {{ cancion.genero }}</p></div>
+            {% if cancion.spotify_url %}
+            <a class="button-secondary" href="{{ cancion.spotify_url }}" target="_blank"
+               rel="noopener noreferrer">Buscar en Spotify</a>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

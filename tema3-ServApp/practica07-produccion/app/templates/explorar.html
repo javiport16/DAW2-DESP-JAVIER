@@ -1,0 +1,147 @@
+{% from "_portada_catalogo.html" import mostrar_portada %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101018">
+    <title>Explorar música | SoundWave AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('inicio') }}" class="logo">
+            <span class="logo-icon">◉</span>
+            SoundWave<span class="logo-ai">AI</span>
+        </a>
+
+        <p class="menu-label">DESCUBRIR</p>
+        <nav class="nav-menu">
+            <a href="{{ url_for('inicio') }}" class="nav-link">⌂ &nbsp; Inicio</a>
+            <a href="{{ url_for('explorar') }}" class="nav-link active">♫ &nbsp; Explorar música</a>
+        </nav>
+
+        <p class="menu-label">TU ESPACIO</p>
+        <nav class="nav-menu">
+            <a href="{{ url_for('biblioteca') }}" class="nav-link">♡ &nbsp; Mi biblioteca</a>
+            <a href="/playlists" class="nav-link">▤ &nbsp; Mis playlists</a>
+            <a href="/dj" class="nav-link">✦ &nbsp; SoundWave DJ</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Descubre algo nuevo.</p>
+            <span>SoundWave AI © 2026</span>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-message">
+                <span class="online-dot"></span>
+                TU UNIVERSO MUSICAL
+            </div>
+                        {% if session.get('usuario_id') %}
+            <div class="user-profile">
+                {% if session.get('avatar_url') %}
+                <img
+                    src="{{ session.get('avatar_url') }}"
+                    alt="Foto de perfil"
+                    class="user-avatar"
+                    referrerpolicy="no-referrer"
+                >
+                {% endif %}
+                <span class="user-name">Hola, {{ session.get('nombre') }}</span>
+                <form action="{{ url_for('logout') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="logout-button">Salir</button>
+                </form>
+            </div>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="login-button">Iniciar sesión con Google</a>
+            {% endif %}
+        </header>
+
+        <section class="catalog-header">
+            <span class="eyebrow">EXPLORE THE SOUND</span>
+            <h1>Explora sin límites<span>.</span></h1>
+            <p>Encuentra canciones, descubre artistas y guarda tus próximos favoritos.</p>
+        </section>
+
+        <form class="search-panel" action="/explorar" method="GET">
+            <input
+                type="search"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="Buscar canciones o artistas..."
+                aria-label="Buscar canciones o artistas"
+            >
+
+            <select name="genero" aria-label="Filtrar por género">
+                <option value="">Todos los géneros</option>
+                {% for genero in generos %}
+                <option value="{{ genero }}" {% if genero_actual == genero %}selected{% endif %}>
+                    {{ genero }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="button-primary">Buscar</button>
+        </form>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">TU PRÓXIMO DESCUBRIMIENTO</span>
+                    <h2>Catálogo musical</h2>
+                </div>
+                <span class="results-count">{{ canciones|length }} canciones</span>
+            </div>
+
+            <div class="songs-grid">
+                {% for cancion in canciones %}
+                <article class="song-card">
+                    {{ mostrar_portada(cancion) }}
+
+                    <div class="song-details">
+                        <span class="song-genre">{{ cancion.genero }}</span>
+                        <h3>{{ cancion.titulo }}</h3>
+                        <p>{{ cancion.artista }}</p>
+                        <small>{{ cancion.album or 'Single' }}</small>
+                    </div>
+                    <div class="song-actions">
+                        {% if cancion.spotify_url %}
+                        <a href="{{ cancion.spotify_url }}" target="_blank" rel="noopener noreferrer" class="spotify-link">
+                            Escuchar en Spotify ↗
+                        </a>
+                        {% endif %}
+                        {% if session.get('usuario_id') %}
+                        <form action="{{ url_for('guardar_favorito', cancion_id=cancion.id) }}" method="POST" class="favorite-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="add-favorite">♡ Guardar en favoritos</button>
+                        </form>
+                        {% else %}
+                        <a href="{{ url_for('login') }}" class="add-favorite">♡ Inicia sesión para guardar</a>
+                        {% endif %}
+                    </div>
+                </article>
+                {% else %}
+                <div class="empty-state">
+                    <span>♫</span>
+                    <h3>No encontramos canciones</h3>
+                    <p>Prueba con otro artista, título o género.</p>
+                    <a href="/explorar" class="button-secondary">Ver todas</a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer class="footer">
+            <span>© 2026 SoundWave AI</span>
+            <span>Discover beyond the algorithm ✦</span>
+        </footer>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{% macro campos_playlist(boton, nombre='', descripcion='') %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="text" name="nombre" value="{{ nombre }}" placeholder="Nombre de la playlist" aria-label="Nombre de la playlist" maxlength="100" required>
+    <input type="text" name="descripcion" value="{{ descripcion }}" placeholder="Descripción (opcional)" aria-label="Descripción opcional" maxlength="255">
+    <button type="submit" class="button-primary">{{ boton }}</button>
+{% endmacro %}
